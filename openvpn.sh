@@ -117,7 +117,6 @@ install_rules() {
        port="501";
     fi
 
-    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
     iptables -A OUTPUT -o lo -j ACCEPT;
     if [[ -n ${SUBNET} ]]; then
         iptables -A INPUT -d ${SUBNET} -j ACCEPT;
@@ -132,7 +131,6 @@ install_rules() {
 }
 
 install_policies() {
-    iptables -P INPUT DROP;
     iptables -P OUTPUT DROP;
     iptables -P FORWARD DROP;
 }
