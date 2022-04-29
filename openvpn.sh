@@ -117,8 +117,10 @@ install_rules() {
        port="501";
     fi
 
-    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
+    iptables -A INPUT -i lo -j ACCEPT;
     iptables -A OUTPUT -o lo -j ACCEPT;
+
+    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
     if [[ -n ${SUBNET} ]]; then
         iptables -A INPUT -d ${SUBNET} -j ACCEPT;
         iptables -A OUTPUT -d ${SUBNET} -j ACCEPT;
@@ -127,8 +129,8 @@ install_rules() {
     iptables -A OUTPUT -d ${DNS} -p tcp --dport 53 -j ACCEPT;
     iptables -A OUTPUT -p tcp -m tcp --dport ${port} -j ACCEPT;
     iptables -A OUTPUT -o tun0 -j ACCEPT;
-    iptables -A OUTPUT -p udp --dport 53 -m owner --gid-owner vpn -j ACCEPT;
-    iptables -A OUTPUT -p tcp --dport 53 -m owner --gid-owner vpn -j ACCEPT;
+    iptables -A OUTPUT -p udp --dport 53 -m owner --uid-owner root -j ACCEPT;
+    iptables -A OUTPUT -p tcp --dport 53 -m owner --uid-owner root -j ACCEPT;
 }
 
 install_policies() {
@@ -164,7 +166,7 @@ install_local_resolve() {
 
     local entry;
     for entry in "${entries[@]}"; do
-        echo "${entry}" >> /etc/hosts
+        echo "${entry}" >> /etc/hosts;
     done
 }
 
@@ -181,10 +183,11 @@ start() {
         exit 1;
     fi
 
-    echo ${USERNAME} >> auth.txt
-    echo ${PASSWORD} >> auth.txt
+    echo ${USERNAME} >> auth.txt;
+    echo ${PASSWORD} >> auth.txt;
     
-    exec sg vpn -c 'openvpn --script-security 2 --config '${CONFIG_DIR}/"${region_file}"' --auth-user-pass auth.txt';
+    chmod 400 auth.txt;
+    openvpn --script-security 2 --config ${CONFIG_DIR}/"${region_file}" --auth-user-pass auth.txt;
 }
 
 main() {
