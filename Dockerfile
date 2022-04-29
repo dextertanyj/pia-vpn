@@ -1,7 +1,7 @@
-FROM alpine:latest
+FROM ubuntu:20.04
 LABEL maintainer="dev@dextertanyj.com"
 
-RUN apk update && apk add bash curl shadow openvpn
+RUN apt-get update && apt-get install bash curl iptables openvpn unzip wget -y
 
 RUN mkdir -p /vpn
 RUN addgroup vpn

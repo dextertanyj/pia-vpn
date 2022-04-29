@@ -97,8 +97,8 @@ update_configs() {
         echo "pull-filter ignore route-ipv6" >> "${file}";
         echo "pull-filter ignore ifconfig-ipv6" >> "${file}";
         echo "dhcp-option DNS ${DNS}" >> "${file}";
-        echo "up /etc/openvpn/up.sh" >> "${file}";
-        echo "down /etc/openvpn/down.sh" >> "${file}";
+        echo "up /etc/openvpn/update-resolv-conf" >> "${file}";
+        echo "down /etc/openvpn/update-resolv-conf" >> "${file}";
     done
 }
 
@@ -117,6 +117,7 @@ install_rules() {
        port="501";
     fi
 
+    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
     iptables -A OUTPUT -o lo -j ACCEPT;
     if [[ -n ${SUBNET} ]]; then
         iptables -A INPUT -d ${SUBNET} -j ACCEPT;
@@ -131,6 +132,7 @@ install_rules() {
 }
 
 install_policies() {
+    iptables -P INPUT DROP;
     iptables -P OUTPUT DROP;
     iptables -P FORWARD DROP;
 }
@@ -179,7 +181,10 @@ start() {
         exit 1;
     fi
 
-    exec sg vpn -c 'openvpn --script-security 2 --config '${CONFIG_DIR}/"${region_file}"' --auth-user-pass <(echo -e "'"${USERNAME}"'\n'"${PASSWORD}"'")';
+    echo ${USERNAME} >> auth.txt
+    echo ${PASSWORD} >> auth.txt
+    
+    exec sg vpn -c 'openvpn --script-security 2 --config '${CONFIG_DIR}/"${region_file}"' --auth-user-pass auth.txt';
 }
 
 main() {
