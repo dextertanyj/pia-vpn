@@ -1,6 +1,6 @@
 # Private Internet Access
 
-A Private Internet Access (PIA) container with built in killswitch.
+A Private Internet Access (PIA) container with built-in kill switch.
 
 ## Usage
 
@@ -67,4 +67,23 @@ docker run -d \
 
 ## Routing Other Containers Through the PIA VPN
 
-Route the traffic of other containers through the VPN using the `--net=container:pia-vpn` option during their creation.
+### Docker Compose
+
+Route the traffic of a service through this container using the `network_mode` key.
+
+```yaml
+version: "3.1"
+services:
+  pia-vpn:
+    image: dextertanyj/pia-vpn
+    # Other configuration details as shown above.
+  ubuntu:
+    image: ubuntu
+    container_name: ubuntu
+    command: ["tail", "-f", "/dev/null"]
+    network_mode: "service:pia-vpn"
+```
+
+### Docker CLI
+
+Route the traffic of other containers this container using the `--net=container:pia-vpn` option during their creation.
