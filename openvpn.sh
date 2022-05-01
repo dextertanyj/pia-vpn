@@ -122,7 +122,7 @@ install_rules() {
 
     iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
     if [[ -n ${SUBNET} ]]; then
-        iptables -A INPUT -d ${SUBNET} -j ACCEPT;
+        iptables -A INPUT -s ${SUBNET} -j ACCEPT;
         iptables -A OUTPUT -d ${SUBNET} -j ACCEPT;
     fi
     iptables -A OUTPUT -d ${DNS} -p udp --dport 53 -j ACCEPT;
