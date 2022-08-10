@@ -19,6 +19,7 @@ services:
       - PASSWORD=password
       - REGION=region
       - CUSTOM_DNS=1.1.1.1 #optional
+      - CUSTOM_FALLBACK_DNS=8.8.8.8 #optional
       - PROTOCOL=TCP #optional
       - STRENGTH=STRONG #optional
       - SUBNET=192.168.1.0/24 #optional
@@ -44,6 +45,7 @@ docker run -d \
   -e PASSWORD=password \
   -e REGION=region \
   -e CUSTOM_DNS=1.1.1.1 \ #optional
+  -e CUSTOM_FALLBACK_DNS=8.8.8.8 \ #optional
   -e PROTOCOL=TCP \ #optional
   -e STRENGTH=STRONG \ #optional
   -e SUBNET=192.168.1.0/24 \ #optional
@@ -54,16 +56,17 @@ docker run -d \
 
 ## Parameters
 
-| Parameter                                    | Function                                           |
-| -------------------------------------------- | -------------------------------------------------- |
-| `-e USERNAME=username`                       | PIA account username                               |
-| `-e PASSWORD=password`                       | PIA account password                               |
-| `-e REGION=region`                           | PIA region                                         |
-| `-e CUSTOM_DNS=1.1.1.1`                      | Custom DNS server                                  |
-| `-e PROTOCOL=TCP`                            | Network protocol (`TCP` or `UDP`)                  |
-| `-e STRENGTH=STRONG`                         | OpenVPN encryption strength (`NORMAL` or `STRONG`) |
-| `-e SUBNET=192.168.1.0/24`                   | Local subnet to route through default gateway      |
-| `-e HOSTS='192.168.1.1 hostname.example.com` | A colon separated list of hosts file entries       |
+| Parameter                                    | Function                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| `-e USERNAME=username`                       | PIA account username                                                      |
+| `-e PASSWORD=password`                       | PIA account password                                                      |
+| `-e REGION=region`                           | PIA region                                                                |
+| `-e CUSTOM_DNS=1.1.1.1`                      | Custom DNS server (Defaults to PIA internal servers)                      |
+| `-e CUSTOM_DNS=1.1.1.1`                      | Custom fallback DNS server (Must be resolvable when not connected to VPN) |
+| `-e PROTOCOL=TCP`                            | Network protocol (`TCP` or `UDP`)                                         |
+| `-e STRENGTH=STRONG`                         | OpenVPN encryption strength (`NORMAL` or `STRONG`)                        |
+| `-e SUBNET=192.168.1.0/24`                   | Local subnet to route through default gateway                             |
+| `-e HOSTS='192.168.1.1 hostname.example.com` | A colon separated list of hosts file entries                              |
 
 ## Routing Other Containers Through the PIA VPN
 

@@ -12,6 +12,7 @@ readonly HOSTS_ENTRY_REGEX='^'${IP_REGEX}'\s+'${HOSTNAME_REGEX}'(\s+'${HOSTNAME_
 readonly PROTO="${PROTOCOL:=TCP}"
 readonly ENC_STR="${STRENGTH:=STRONG}"
 readonly DNS=${CUSTOM_DNS:=10.0.0.242}
+readonly FALLBACK_DNS=${CUSTOM_FALLBACK_DNS:=1.1.1.1}
 
 validate_env() {
     if [[ -z "${USERNAME}" ]]; then
@@ -46,6 +47,11 @@ validate_env() {
 
     if ! [[ "${DNS}" =~ ${IP_ONLY_REGEX} ]]; then
         echo "Invalid DNS server IP address";
+        exit 1;
+    fi
+
+    if ! [[ "${FALLBACK_DNS}" =~ ${IP_ONLY_REGEX} ]]; then
+        echo "Invalid fallback DNS server IP address";
         exit 1;
     fi
 
@@ -97,6 +103,7 @@ update_configs() {
         echo "pull-filter ignore route-ipv6" >> "${file}";
         echo "pull-filter ignore ifconfig-ipv6" >> "${file}";
         echo "dhcp-option DNS ${DNS}" >> "${file}";
+        echo "dhcp-option DNS ${FALLBACK_DNS}" >> "${file}";
         echo "up /etc/openvpn/update-resolv-conf" >> "${file}";
         echo "down /etc/openvpn/update-resolv-conf" >> "${file}";
     done
