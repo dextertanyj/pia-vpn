@@ -128,6 +128,7 @@ install_rules() {
     iptables -A OUTPUT -o lo -j ACCEPT;
 
     iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
+    iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
     if [[ -n ${SUBNET} ]]; then
         iptables -A INPUT -s ${SUBNET} -j ACCEPT;
         iptables -A OUTPUT -d ${SUBNET} -j ACCEPT;
@@ -138,6 +139,22 @@ install_rules() {
     iptables -A OUTPUT -o tun0 -j ACCEPT;
     iptables -A OUTPUT -p udp --dport 53 -m owner --uid-owner root -j ACCEPT;
     iptables -A OUTPUT -p tcp --dport 53 -m owner --uid-owner root -j ACCEPT;
+
+    
+    if [[ -z "${PORTS}" ]]; then
+        return;
+    fi
+
+    local entries;
+    readarray -d " " -t entries <<< "${PORTS}";
+
+    local entry;
+    for entry in "${entries[@]}"; do
+        local proto=$(echo ${entry%:*} | tr '[:upper:]' '[:lower:]')
+        local port=${entry#*:}
+        iptables -A INPUT -p ${proto} --dport ${port} -j ACCEPT;
+        iptables -A OUTPUT -p ${proto} --sport ${port} -j ACCEPT;
+    done
 }
 
 install_policies() {
